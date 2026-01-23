@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 
 void main() {
@@ -8,14 +9,14 @@ void main() {
 
 class AppState extends ChangeNotifier {
   var tasks = ["Task 1","Task 2"];
-  var temp_edit = "";
+  var tempEdit = "";
 
   //void changeTask
 
   void addTask(String name) {
     tasks.add(name);
     notifyListeners();
-    print("New task added: " + name);
+    //print("New task added: " + name);
   }
 
   Widget _addDialog(BuildContext context) {
@@ -28,7 +29,7 @@ class AppState extends ChangeNotifier {
           Padding(
           padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
           child: TextField(
-            onChanged: (String change) {temp_edit=change;print(change);},
+            onChanged: (String change) {tempEdit=change;},
             decoration: const InputDecoration(
               border: OutlineInputBorder(),
               hintText: 'Task name',
@@ -42,11 +43,11 @@ class AppState extends ChangeNotifier {
           onPressed: () {
             Navigator.pop(context);
           },
-          child: const Text('Close'),
+          child: const Text('Cancel'),
         ),
         TextButton(
           onPressed: () {
-            addTask(temp_edit);
+            addTask(tempEdit);
             Navigator.pop(context);
           },
           child: const Text('Add task'),
@@ -87,6 +88,7 @@ class AppColors {
 
 class ThemeConfig {
   static ThemeData lightTheme = ThemeData(
+    fontFamily: 'Inter',
     useMaterial3: true,
     brightness: Brightness.dark,
     primaryColor: AppColors.primary,
@@ -105,6 +107,7 @@ class ThemeConfig {
   );
 
   static ThemeData darkTheme = ThemeData(
+    fontFamily: 'Inter',
     useMaterial3: true,
     brightness: Brightness.dark,
     primaryColor: AppColors.secondary,
@@ -184,7 +187,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
       floatingActionButton: FloatingActionButton(
         onPressed: (){
-          print("+ button pressed");
           showDialog<void>(
                   context: context,
                   useRootNavigator: true, // ignore: avoid_redundant_argument_values
@@ -279,15 +281,15 @@ class _BottomNavBarState extends State<BottomNavBar> {
         selectedIndex: currentPageIndex,
         destinations: const <Widget>[
           NavigationDestination(
-            icon: Badge(label: Text('2'), child: Icon(Icons.circle)),
+            icon: Badge(label: Text('2'), child: Icon(Symbols.task_rounded, fill:1)),
             label: 'To-do',
           ),
           NavigationDestination(
-            icon: Icon(Icons.home),
+            icon: Icon(Symbols.home_rounded, fill:1),
             label: 'Home',
           ),
           NavigationDestination(
-            icon: Icon(Icons.book),
+            icon: Icon(Symbols.book_rounded, fill:1),
             label: 'Classes',
           ),
         ],
