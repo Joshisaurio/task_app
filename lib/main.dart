@@ -8,13 +8,13 @@ void main() {
 }
 
 class AppState extends ChangeNotifier {
-  var tasks = ["Task 1","Task 2"];
+  var tasks = [["Task 1"], ["Task 2"]];
   var tempEdit = "";
 
   //void changeTask
 
   void addTask(String name) {
-    tasks.add(name);
+    tasks.add([name]);
     notifyListeners();
     //print("New task added: " + name);
   }
@@ -43,14 +43,14 @@ class AppState extends ChangeNotifier {
           onPressed: () {
             Navigator.pop(context);
           },
-          child: const Text('Cancel'),
+          child: const Text('Cancel', style:TextStyle(color:Colors.white),),
         ),
         TextButton(
           onPressed: () {
             addTask(tempEdit);
             Navigator.pop(context);
           },
-          child: const Text('Add task'),
+          child: const Text('Add task', style:TextStyle(color:Colors.white),),
         ),
       ],
     );
@@ -66,7 +66,7 @@ class MyApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (context) => AppState(),
       child:MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Task app',
       theme: ThemeConfig.darkTheme,
       darkTheme: ThemeConfig.darkTheme,
       themeMode: ThemeMode.system,
@@ -161,15 +161,6 @@ class _MyHomePageState extends State<MyHomePage> {
     // than having to individually change instances of widgets.
 
     return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        //backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
       body: Padding(
         padding: EdgeInsetsGeometry.all(0.8),
         child:Column(
@@ -194,7 +185,7 @@ class _MyHomePageState extends State<MyHomePage> {
           );
         },
         tooltip: 'New task',
-        child: const Icon(Icons.add),
+        child: const Icon(Symbols.add, weight:500),
       ), //
 
       bottomNavigationBar: BottomNavBar(),
@@ -223,7 +214,7 @@ class TaskDisplay extends StatelessWidget {
                   for (int i=0; i<taskAppState.tasks.length; i++)
                   Padding(padding: const EdgeInsets.all(15.0),
                           child:ListTile(
-                            title:Text(taskAppState.tasks[i]),
+                            title:Text(taskAppState.tasks[i][0]),
                             splashColor: Theme.of(context).colorScheme.primary,),),
                   ]
               )
