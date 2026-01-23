@@ -7,10 +7,52 @@ void main() {
 }
 
 class AppState extends ChangeNotifier {
-  var tasks = [["Task 1", "Task 2"]];
+  var tasks = ["Task 1","Task 2"];
+  var temp_edit = "";
 
-  void addTask(name) {
-    tasks.add([name]);
+  //void changeTask
+
+  void addTask(String name) {
+    tasks.add(name);
+    notifyListeners();
+    print("New task added: " + name);
+  }
+
+  Widget _addDialog(BuildContext context) {
+    return AlertDialog(
+      title: Text('New task'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          //Text("Create a task"),
+          Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+          child: TextField(
+            onChanged: (String change) {temp_edit=change;print(change);},
+            decoration: const InputDecoration(
+              border: OutlineInputBorder(),
+              hintText: 'Task name',
+            ),
+          ),
+        ),
+        ],
+      ),
+      actions: <Widget>[
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          child: const Text('Close'),
+        ),
+        TextButton(
+          onPressed: () {
+            addTask(temp_edit);
+            Navigator.pop(context);
+          },
+          child: const Text('Add task'),
+        ),
+      ],
+    );
   }
 }
 
@@ -51,13 +93,13 @@ class ThemeConfig {
     scaffoldBackgroundColor: Color(0xFF121125),
     colorScheme: ColorScheme.dark(
         brightness: Brightness.dark,
-        primary: Color(0x7F78A3D7),
+        primary: AppColors.primary,
         onPrimary: Colors.white,
-        secondary: Color(0x7F4C5261),
+        secondary: AppColors.secondary,
         onSecondary: Colors.white,
         error: Colors.red,
         onError: Colors.white,
-        surface: Color(0x7F4C5261),
+        surface: AppColors.secondary,
         onSurface: Colors.white
     )
   );
@@ -69,13 +111,13 @@ class ThemeConfig {
     scaffoldBackgroundColor: Color(0xFF121125),
     colorScheme: ColorScheme.dark(
         brightness: Brightness.dark,
-        primary: Color(0x7F78A3D7),
+        primary: AppColors.primary,
         onPrimary: Colors.white,
-        secondary: Color(0x7F4C5261),
+        secondary: AppColors.secondary,
         onSecondary: Colors.white,
         error: Colors.red,
         onError: Colors.white,
-        surface: Color(0x7F4C5261),
+        surface: AppColors.secondary,
         onSurface: Colors.white
     )
   );
@@ -102,6 +144,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int currentPageIndex = 0;
+  
   
 
   @override
@@ -142,8 +185,13 @@ class _MyHomePageState extends State<MyHomePage> {
       floatingActionButton: FloatingActionButton(
         onPressed: (){
           print("+ button pressed");
+          showDialog<void>(
+                  context: context,
+                  useRootNavigator: true, // ignore: avoid_redundant_argument_values
+                  builder: appState._addDialog,
+          );
         },
-        tooltip: 'Increment',
+        tooltip: 'New task',
         child: const Icon(Icons.add),
       ), //
 
@@ -159,6 +207,7 @@ class TaskDisplay extends StatelessWidget {
   
   @override
   Widget build(BuildContext context) {
+    var taskAppState = context.watch<AppState>();
     return Flexible(
           child: Padding(
             padding: const EdgeInsets.all(15.0),
@@ -169,8 +218,12 @@ class TaskDisplay extends StatelessWidget {
               color: Theme.of(context).colorScheme.secondary,
               child: Column(
                 children: [
-                  ListTile(title:Text("Test"), splashColor: Theme.of(context).colorScheme.primary,),
-                ]
+                  for (int i=0; i<taskAppState.tasks.length; i++)
+                  Padding(padding: const EdgeInsets.all(15.0),
+                          child:ListTile(
+                            title:Text(taskAppState.tasks[i]),
+                            splashColor: Theme.of(context).colorScheme.primary,),),
+                  ]
               )
               )
               ],
@@ -193,13 +246,20 @@ class _BottomNavBarState extends State<BottomNavBar> {
 
   Widget _buildDialog(BuildContext context) {
     return AlertDialog(
-      title: Text('This section of the app is currently unavailable. Stay tuned for more updates!'),
+      title: Text('Unavailable'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text("This section of the app is currently unavailable."),
+          Text("Stay tuned for more updates!")
+        ],
+      ),
       actions: <Widget>[
         TextButton(
           onPressed: () {
             Navigator.pop(context);
           },
-          child: const Text('OK'),
+          child: const Text('Close'),
         ),
       ],
     );
