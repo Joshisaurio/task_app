@@ -8,8 +8,9 @@ void main() {
 }
 
 class AppState extends ChangeNotifier {
-  var tasks = [["Task 1"], ["Task 2"]];
+  var tasks = <List>[];
   var tempEdit = "";
+  bool isInputValid = false;
 
   //void changeTask
 
@@ -19,17 +20,28 @@ class AppState extends ChangeNotifier {
     //print("New task added: " + name);
   }
 
+  void addTaskFromInput() {
+    tasks.add([tempEdit]);
+    tempEdit="";
+    validateInput(tempEdit);
+  }
+
+  void validateInput (String input) {
+    isInputValid = input.isNotEmpty;
+    notifyListeners();
+  }
+
   Widget _addDialog(BuildContext context) {
+    var appState = context.watch<AppState>();
     return AlertDialog(
       title: Text('New task'),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          //Text("Create a task"),
           Padding(
           padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
           child: TextField(
-            onChanged: (String change) {tempEdit=change;},
+            onChanged: (String change) {tempEdit=change;validateInput(change);},
             decoration: const InputDecoration(
               border: OutlineInputBorder(),
               hintText: 'Task name',
@@ -46,11 +58,16 @@ class AppState extends ChangeNotifier {
           child: const Text('Cancel', style:TextStyle(color:Colors.white),),
         ),
         TextButton(
+          style: !appState.isInputValid ? ButtonStyle(backgroundColor: WidgetStateColor.transparent,overlayColor: WidgetStateColor.transparent,) : ButtonStyle(),
           onPressed: () {
-            addTask(tempEdit);
+            if(appState.isInputValid) {
+            addTaskFromInput();
             Navigator.pop(context);
+            }
           },
-          child: const Text('Add task', style:TextStyle(color:Colors.white),),
+          child: Text('Add task', style:TextStyle(
+            color: appState.isInputValid ? Colors.white : Colors.grey,
+            ),),
         ),
       ],
     );
@@ -67,8 +84,8 @@ class MyApp extends StatelessWidget {
       create: (context) => AppState(),
       child:MaterialApp(
       title: 'Task app',
-      theme: ThemeConfig.darkTheme,
-      darkTheme: ThemeConfig.darkTheme,
+      theme: ThemeConfig.mainTheme,
+      darkTheme: ThemeConfig.mainTheme,
       themeMode: ThemeMode.system,
       home: const MyHomePage(title: 'Home'),
       ),
@@ -87,31 +104,42 @@ class AppColors {
 }
 
 class ThemeConfig {
-  static ThemeData lightTheme = ThemeData(
-    fontFamily: 'Inter',
-    useMaterial3: true,
-    brightness: Brightness.dark,
-    primaryColor: AppColors.primary,
-    scaffoldBackgroundColor: Color(0xFF121125),
-    colorScheme: ColorScheme.dark(
-        brightness: Brightness.dark,
-        primary: AppColors.primary,
-        onPrimary: Colors.white,
-        secondary: AppColors.secondary,
-        onSecondary: Colors.white,
-        error: Colors.red,
-        onError: Colors.white,
-        surface: AppColors.secondary,
-        onSurface: Colors.white
-    )
-  );
+  
+  // THEME CONFIG //
 
-  static ThemeData darkTheme = ThemeData(
+  static ThemeData mainTheme = ThemeData(
+    // FONT & TEXT
     fontFamily: 'Inter',
-    useMaterial3: true,
-    brightness: Brightness.dark,
+    textTheme: TextTheme(
+      // HEADLINE:
+      headlineLarge: TextStyle(
+        fontSize: 30,
+        fontWeight: FontWeight.w800,
+      ),
+
+      // TITLES
+      titleMedium: TextStyle(
+        fontSize: 18,
+        fontWeight: FontWeight.w700,
+      ),
+      titleSmall: TextStyle( // There was no subtitle so I used titleSmall as a subtitle
+        fontSize: 16,
+        fontWeight: FontWeight.w500,
+      ),
+
+      // BODY
+      bodyMedium: TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.w400,
+      ),
+
+    ),
+
+    // COLOR SCHEME
     primaryColor: AppColors.secondary,
     scaffoldBackgroundColor: Color(0xFF121125),
+    brightness: Brightness.dark,
+
     colorScheme: ColorScheme.dark(
         brightness: Brightness.dark,
         primary: AppColors.primary,
@@ -122,7 +150,10 @@ class ThemeConfig {
         onError: Colors.white,
         surface: AppColors.secondary,
         onSurface: Colors.white
-    )
+    ),
+
+    // OTHER
+    useMaterial3: true,
   );
 }
 
@@ -147,33 +178,31 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int currentPageIndex = 0;
-  
-  
 
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<AppState>();
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
 
     return Scaffold(
       body: Padding(
-        padding: EdgeInsetsGeometry.all(0.8),
-        child:Column(
-          mainAxisSize: MainAxisSize.max,
+        padding: EdgeInsetsGeometry.fromLTRB(0, 30, 0, 0),
+
+        //   PAGE CONTENT START   //
+        // Page content goes here //
+
+        child:ListView(
           children: [
-            Expanded(
-              child:Padding(
-                padding: const EdgeInsets.all(30.0),
-                child: TaskDisplay(),
-              )
+            Padding(
+              padding: const EdgeInsets.fromLTRB(30, 0, 30, 30),
+              child: Text("Home", style: Theme.of(context).textTheme.headlineLarge),
             ),
-          ]
-        )
+            TaskDisplay(),
+          ],
+        ),
+
+        //    PAGE CONTENT END    //
+        // Page content ends here //
+
       ),
 
       floatingActionButton: FloatingActionButton(
@@ -186,16 +215,30 @@ class _MyHomePageState extends State<MyHomePage> {
         },
         tooltip: 'New task',
         child: const Icon(Symbols.add_rounded, weight:500),
-      ), //
+      ),
 
-      //bottomNavigationBar: BottomNavBar(),
-
-      bottomNavigationBar: BottomNavBar()
-      
-      // This trailing comma makes auto-formatting nicer for build methods.
+      bottomNavigationBar: BottomNavBar(),
     );
   }
 }
+
+/*
+// FOR LOOP EXAMPLES: //
+children:[
+for (int i; i<10; i++)
+  Widget()
+]
+
+
+children:[
+for (int i=0; i<taskAppState.tasks.length; i++)
+  Padding(padding: const EdgeInsets.all(15.0),
+          child:ListTile(
+            title:Text(taskAppState.tasks[i][0]),
+            splashColor: Theme.of(context).colorScheme.primary,),),
+]
+*/
+
 
 class TaskDisplay extends StatelessWidget {
   const TaskDisplay({super.key});
@@ -203,30 +246,52 @@ class TaskDisplay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var taskAppState = context.watch<AppState>();
-    return Flexible(
-          child: Padding(
-            padding: const EdgeInsets.all(15.0),
-            child: ListView(
-              shrinkWrap: true,
-              children: [
-              Container(
-              color: Theme.of(context).colorScheme.secondary,
-              child: Column(
-                children: [
-                  for (int i=0; i<taskAppState.tasks.length; i++)
-                  Padding(padding: const EdgeInsets.all(15.0),
-                          child:ListTile(
-                            title:Text(taskAppState.tasks[i][0]),
-                            splashColor: Theme.of(context).colorScheme.primary,),),
-                  ]
-              )
-              )
-              ],
-            ),
-      ),
+    return Card(
+    margin: EdgeInsets.fromLTRB(20, 0, 20, 20),
+    color: Theme.of(context).colorScheme.secondary,
+    elevation: 0.0,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(20.0), // Adjust the radius as needed
+    ),
+    
+    // TASK DISPLAY START //
+    
+    child: ListTile(
+      title: Text("Tasks",style:Theme.of(context).textTheme.titleMedium),
+      subtitle: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children:[
+            if (taskAppState.tasks.length > 1)
+              Text("You have ${taskAppState.tasks.length.toString()} pending tasks.", style:Theme.of(context).textTheme.bodyMedium)
+            else
+              if (taskAppState.tasks.isEmpty)
+                Text("You have no tasks yet. Press the + button below to add a task.",style:Theme.of(context).textTheme.bodyMedium)
+              else
+                Text("You have one pending task.",style:Theme.of(context).textTheme.bodyMedium),
+            
+
+            for (int i=0; i<taskAppState.tasks.length; i++)
+              Card(
+                margin: EdgeInsets.fromLTRB(0, 5, 0, 5),
+                shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(2000.0), // Adjust the radius as needed
+                ),
+                elevation: 0.0,
+                color: Theme.of(context).colorScheme.primary,
+                child: ListTile(
+                  leading: Icon(Symbols.task_alt_rounded, fill:1),
+                  title:Text(taskAppState.tasks[i][0], style:Theme.of(context).textTheme.bodyMedium),
+                  ),
+              ),
+          ],
+        ),
+        ),
+    
+    // TASK DISPLAY END //
+    
     );
   }
-  
 }
 
 class BottomNavBar extends StatefulWidget {
@@ -263,20 +328,19 @@ class _BottomNavBarState extends State<BottomNavBar> {
   @override
   Widget build(BuildContext context) {
     return NavigationBar(
-        //onDestinationSelected: (int index) {
-        //  showDialog<void>(
-        //    context: context,
-        //    useRootNavigator: true, // ignore: avoid_redundant_argument_values
-        //    builder: _buildDialog,
-        //  );
-        //},
+        onDestinationSelected: (int index) {
+          showDialog<void>(
+            context: context,
+            useRootNavigator: true, // ignore: avoid_redundant_argument_values
+            builder: _buildDialog,
+          );
+        },
         indicatorColor: Theme.of(context).colorScheme.primary,
         selectedIndex: currentPageIndex,
         labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
         destinations: [
           //DecoratedBox(decoration: BoxDecoration(color:Colors.blue), child: Row(children: [Icon(Symbols.settings)]),),
           NavigationDestination(
-            enabled:false,
             icon: Row(
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -307,7 +371,6 @@ class _BottomNavBarState extends State<BottomNavBar> {
             label: 'Home',
           ),
           NavigationDestination(
-            enabled:false,
             icon: Row(
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
