@@ -185,10 +185,12 @@ class _MyHomePageState extends State<MyHomePage> {
           );
         },
         tooltip: 'New task',
-        child: const Icon(Symbols.add, weight:500),
+        child: const Icon(Symbols.add_rounded, weight:500),
       ), //
 
-      bottomNavigationBar: BottomNavBar(),
+      //bottomNavigationBar: BottomNavBar(),
+
+      bottomNavigationBar: BottomNavBar()
       
       // This trailing comma makes auto-formatting nicer for build methods.
     );
@@ -261,26 +263,63 @@ class _BottomNavBarState extends State<BottomNavBar> {
   @override
   Widget build(BuildContext context) {
     return NavigationBar(
-        onDestinationSelected: (int index) {
-          showDialog<void>(
-                  context: context,
-                  useRootNavigator: true, // ignore: avoid_redundant_argument_values
-                  builder: _buildDialog,
-          );
-        },
+        //onDestinationSelected: (int index) {
+        //  showDialog<void>(
+        //    context: context,
+        //    useRootNavigator: true, // ignore: avoid_redundant_argument_values
+        //    builder: _buildDialog,
+        //  );
+        //},
         indicatorColor: Theme.of(context).colorScheme.primary,
         selectedIndex: currentPageIndex,
-        destinations: const <Widget>[
+        labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
+        destinations: [
+          //DecoratedBox(decoration: BoxDecoration(color:Colors.blue), child: Row(children: [Icon(Symbols.settings)]),),
           NavigationDestination(
-            icon: Badge(label: Text('2'), child: Icon(Symbols.task_rounded, fill:1)),
+            enabled:false,
+            icon: Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              spacing:10.0,
+              children: [
+                SizedBox(width:1, height: 5,),
+                Badge(label: Text('0'), child: Icon(Symbols.task_rounded, fill:1)),
+                Text("To-Do"),
+                SizedBox(width:1, height: 5,),
+              ],
+            ),
             label: 'To-do',
           ),
           NavigationDestination(
-            icon: Icon(Symbols.home_rounded, fill:1),
+            icon: Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                spacing:10.0,
+                children: [
+                  SizedBox(width:1, height: 5,),
+                  Icon(Symbols.home_rounded, fill:1),
+                  //Text("Home"),
+                  SizedBox(width:1, height: 5,),
+                ],
+              ),
             label: 'Home',
           ),
           NavigationDestination(
-            icon: Icon(Symbols.book_rounded, fill:1),
+            enabled:false,
+            icon: Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              spacing:10.0,
+              children: [
+                SizedBox(width:1, height: 5,),
+                Icon(Symbols.book_rounded, fill:1),
+                Text("Classes"),
+                SizedBox(width:1, height: 5,),
+              ],
+            ),
             label: 'Classes',
           ),
         ],
